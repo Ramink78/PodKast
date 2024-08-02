@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">PodKast</string>
+    <string name="genre_art">Art</string>
+    <string name="genre_art_books">Art Books</string>
+    <string name="genre_fashion">Fashion / Beauty</string>
+    <string name="genre_food">Food</string>
+    <string name="genre_business">Business</string>
+    <string name="genre_comedy">Comedy &amp; Standup</string>
+    <string name="genre_education">Education</string>
+    <string name="genre_sports">Sports</string>
+    <string name="genre_technology">Tech</string>
+    <string name="genre_drama">Drama</string>
+    <string name="genre_government">Government</string>
+    <string name="genre_history">History</string>
+    <string name="genre_fitness">Health &amp; Fitness</string>
+    <string name="genre_family">Family</string>
+    <string name="genre_games">Games</string>
+    <string name="genre_news">News</string>
+    <string name="genre_music">Music</string>
+    <string name="genre_science">Science</string>
+    <string name="genre_film">TV / Film</string>
+    <string name="interest_screen_welcome">Welcome to PodKast</string>
+    <string name="interest_screen_guide">Choose what interests you</string>
+    <string name="interest_error">The selected genres must be at least 3</string>
 </resources>
