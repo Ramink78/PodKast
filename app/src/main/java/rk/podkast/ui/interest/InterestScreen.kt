@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,24 +31,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import rk.podkast.R
@@ -55,6 +52,7 @@ import rk.podkast.data.GenreRepositoryImpl
 import rk.podkast.data.database.AppDatabase
 import rk.podkast.data.database.entity.Genre
 import rk.podkast.ui.theme.PodKastTheme
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 
@@ -106,17 +104,14 @@ fun InterestScreen(
                         val textToMeasure = context.getString(it.type.nameRes)
                         val textLayoutResult = textMeasurer.measure(
                             text = textToMeasure,
-                            style = textStyle,
-                            softWrap = false
+                            style = textStyle, softWrap = false, maxLines = 1
                         )
-                        val requireWidthForText =
-                            textLayoutResult.size.width + (gridItemInnerPadding * 2).toPx()
-                                .roundToInt()
-                        if (requireWidthForText >= gridItemSize.toPx().roundToInt()
+                        val requiredSpan = calculateRequiredSpan(
+                            textLayoutResult = textLayoutResult,
+                            horizontalPaddingInPx = gridItemInnerPadding.toPx().roundToInt(),
+                            spanSizeInPx = gridItemSize.toPx().roundToInt()
                         )
-                            GridItemSpan(2)
-                        else
-                            GridItemSpan(1)
+                        GridItemSpan(requiredSpan)
                     }
 
                 }
@@ -152,49 +147,12 @@ fun InterestScreen(
     }
 }
 
-@Composable
-private fun AutoResizedText(
-    modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Unspecified,
-    style: TextStyle = MaterialTheme.typography.labelLarge,
-    color: Color = style.color,
-    text: String
-) {
-    var resizedTextStyle by remember {
-        mutableStateOf(style)
-    }
-    var shouldDraw by remember {
-        mutableStateOf(false)
-    }
-
-    val defaultFontSize = style.fontSize
-
-    Text(
-        textAlign = textAlign,
-        text = text,
-        color = color,
-        modifier = modifier.drawWithContent {
-            if (shouldDraw) {
-                drawContent()
-            }
-        },
-        softWrap = false,
-        style = resizedTextStyle,
-        onTextLayout = { result ->
-            if (result.didOverflowWidth) {
-                if (style.fontSize.isUnspecified) {
-                    resizedTextStyle = resizedTextStyle.copy(
-                        fontSize = defaultFontSize
-                    )
-                }
-                resizedTextStyle = resizedTextStyle.copy(
-                    fontSize = resizedTextStyle.fontSize * 0.95
-                )
-            } else {
-                shouldDraw = true
-            }
-        }
-    )
+private fun LazyGridItemSpanScope.calculateRequiredSpan(
+    textLayoutResult: TextLayoutResult, horizontalPaddingInPx: Int, spanSizeInPx: Int
+): Int {
+    val requireWidthForText = textLayoutResult.size.width + 2 * horizontalPaddingInPx
+    return ceil((requireWidthForText.toFloat() / spanSizeInPx)).toInt()
+        .coerceIn(1..maxLineSpan)
 }
 
 @Composable
@@ -253,10 +211,10 @@ private fun GenreItem(
                 .fillMaxSize()
                 .padding(textPadding), contentAlignment = Alignment.Center
         ) {
-            AutoResizedText(
+            Text(
                 textAlign = TextAlign.Center,
                 style = textStyle,
-                text = text, color = textColor,
+                text = text, color = textColor, maxLines = 1, softWrap = false
             )
         }
 
