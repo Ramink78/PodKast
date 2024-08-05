@@ -6,20 +6,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
-import rk.podkast.data.GenreType
-import rk.podkast.data.database.entity.Genre
+import rk.podkast.data.database.entity.GenreEntity
 
 @Dao
 interface GenreDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun interest(genre: Genre)
+    suspend fun interest(genreEntity: GenreEntity)
 
     @Delete
-    suspend fun notInterest(genre: Genre)
+    suspend fun notInterest(genreEntity: GenreEntity)
 
     @Query("select * from interest_genre")
-    fun interestedGenresFlow(): Flow<List<Genre>>
+    fun interestedGenresFlow(): Flow<List<GenreEntity>>
 
-    @Query("select * from interest_genre where type = :type")
-    suspend fun isExist(type: GenreType): List<Genre>
 }

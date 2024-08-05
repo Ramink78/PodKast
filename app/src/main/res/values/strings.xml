@@ -13,7 +13,7 @@
     <string name="genre_government">Government</string>
     <string name="genre_history">History</string>
     <string name="genre_fitness">Health &amp; Fitness</string>
-    <string name="genre_family">Family</string>
+    <string name="genre_family">Kids &amp; Family</string>
     <string name="genre_games">Games</string>
     <string name="genre_news">News</string>
     <string name="genre_music">Music</string>
@@ -22,4 +22,6 @@
     <string name="interest_screen_welcome">Welcome to PodKast</string>
     <string name="interest_screen_guide">Choose what interests you</string>
     <string name="interest_error">The selected genres must be at least 3</string>
+    <string name="you_re_interested">You\'re Interested</string>
+    <string name="maybe_you_re_interested">Maybe You\'re Interested</string>
 </resources>

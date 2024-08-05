@@ -1,6 +1,7 @@
 package rk.podkast.ui.interest
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +16,17 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemSpanScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -30,31 +34,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import rk.podkast.R
 import rk.podkast.data.GenreRepositoryImpl
 import rk.podkast.data.database.AppDatabase
-import rk.podkast.data.database.entity.Genre
 import rk.podkast.ui.theme.PodKastTheme
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 
@@ -71,7 +74,6 @@ fun InterestScreen(
         InterestScreenViewModel.Companion.Factory(
             GenreRepositoryImpl(
                 AppDatabase.getInstance(context.applicationContext).genreDao(),
-                context.applicationContext
             )
         )
     )
@@ -84,6 +86,7 @@ fun InterestScreen(
     val listContentBottomPadding =
         fabSize + fabPadding + WindowInsets.navigationBars.asPaddingValues()
             .calculateBottomPadding()
+    val sectionsAlpha by animateFloatAsState(targetValue = if (uiState.interestGenreEntities.isEmpty()) 0f else 1f)
     Box(modifier = modifier) {
         LazyVerticalGrid(
             modifier = Modifier.fillMaxSize(),
@@ -96,37 +99,75 @@ fun InterestScreen(
                 bottom = listContentBottomPadding
             )
         ) {
-            item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Header()
             }
+
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Title(text = stringResource(R.string.you_re_interested),
+                    modifier = Modifier.graphicsLayer {
+                        alpha = sectionsAlpha
+                    })
+            }
+
+            items(uiState.interestGenreEntities, key = { it.type }, span = {
+                with(density) {
+                    val textToMeasure = context.getString(it.type.nameRes)
+                    val textLayoutResult = textMeasurer.measure(
+                        text = textToMeasure, style = textStyle, softWrap = false, maxLines = 1
+                    )
+                    val requiredSpan = calculateRequiredSpan(
+                        textLayoutResult = textLayoutResult,
+                        horizontalPaddingInPx = gridItemInnerPadding.toPx().roundToInt(),
+                        spanSizeInPx = gridItemSize.toPx().roundToInt()
+                    )
+                    GridItemSpan(requiredSpan)
+                }
+
+            }) {
+                GenreItem(
+                    modifier = Modifier
+                        .animateItem()
+                        .height(gridItemSize),
+                    text = stringResource(id = it.type.nameRes),
+                    onSelect = { viewModel.notInterest(it) },
+                    isSelected = true,
+                    textStyle = textStyle,
+                    textPadding = gridItemInnerPadding
+                )
+            }
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Title(text = stringResource(R.string.maybe_you_re_interested),
+                    modifier = Modifier.graphicsLayer {
+                        alpha = sectionsAlpha
+                    })
+            }
             items(
-                uiState.allGenres, key = { it.type },
+                uiState.notInterestedGenreEntities, key = { it.type },
                 span = {
                     with(density) {
                         val textToMeasure = context.getString(it.type.nameRes)
                         val textLayoutResult = textMeasurer.measure(
                             text = textToMeasure,
-                            style = textStyle,
-                            softWrap = false
+                            style = textStyle, softWrap = false, maxLines = 1
                         )
-                        val requireWidthForText =
-                            textLayoutResult.size.width + (gridItemInnerPadding * 2).toPx()
-                                .roundToInt()
-                        if (requireWidthForText >= gridItemSize.toPx().roundToInt()
+                        val requiredSpan = calculateRequiredSpan(
+                            textLayoutResult = textLayoutResult,
+                            horizontalPaddingInPx = gridItemInnerPadding.toPx().roundToInt(),
+                            spanSizeInPx = gridItemSize.toPx().roundToInt()
                         )
-                            GridItemSpan(2)
-                        else
-                            GridItemSpan(1)
+                        GridItemSpan(requiredSpan)
                     }
 
                 }
             ) {
                 GenreItem(
                     modifier = Modifier
+                        .animateItem()
                         .height(gridItemSize),
                     text = stringResource(id = it.type.nameRes),
-                    onSelect = { viewModel.toggleGenre(it.type) },
-                    isSelected = uiState.interestGenres.contains(Genre(it.type)),
+                    onSelect = { viewModel.interest(it) },
+                    isSelected = false,
                     textStyle = textStyle,
                     textPadding = gridItemInnerPadding
                 )
@@ -152,49 +193,28 @@ fun InterestScreen(
     }
 }
 
+private fun LazyGridItemSpanScope.calculateRequiredSpan(
+    textLayoutResult: TextLayoutResult, horizontalPaddingInPx: Int, spanSizeInPx: Int
+): Int {
+    val requireWidthForText = textLayoutResult.size.width + 2 * horizontalPaddingInPx
+    return ceil((requireWidthForText.toFloat() / spanSizeInPx)).toInt()
+        .coerceIn(1..maxLineSpan)
+}
+
 @Composable
-private fun AutoResizedText(
-    modifier: Modifier = Modifier,
-    textAlign: TextAlign = TextAlign.Unspecified,
-    style: TextStyle = MaterialTheme.typography.labelLarge,
-    color: Color = style.color,
-    text: String
-) {
-    var resizedTextStyle by remember {
-        mutableStateOf(style)
+private fun Title(text: String, modifier: Modifier) {
+    Column(modifier = modifier) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        HorizontalDivider(
+            thickness = 2.dp, modifier = Modifier
+                .clip(CircleShape)
+                .padding(vertical = 8.dp)
+        )
     }
-    var shouldDraw by remember {
-        mutableStateOf(false)
-    }
-
-    val defaultFontSize = style.fontSize
-
-    Text(
-        textAlign = textAlign,
-        text = text,
-        color = color,
-        modifier = modifier.drawWithContent {
-            if (shouldDraw) {
-                drawContent()
-            }
-        },
-        softWrap = false,
-        style = resizedTextStyle,
-        onTextLayout = { result ->
-            if (result.didOverflowWidth) {
-                if (style.fontSize.isUnspecified) {
-                    resizedTextStyle = resizedTextStyle.copy(
-                        fontSize = defaultFontSize
-                    )
-                }
-                resizedTextStyle = resizedTextStyle.copy(
-                    fontSize = resizedTextStyle.fontSize * 0.95
-                )
-            } else {
-                shouldDraw = true
-            }
-        }
-    )
 }
 
 @Composable
@@ -253,10 +273,10 @@ private fun GenreItem(
                 .fillMaxSize()
                 .padding(textPadding), contentAlignment = Alignment.Center
         ) {
-            AutoResizedText(
+            Text(
                 textAlign = TextAlign.Center,
                 style = textStyle,
-                text = text, color = textColor,
+                text = text, color = textColor, maxLines = 1, softWrap = false
             )
         }
 
