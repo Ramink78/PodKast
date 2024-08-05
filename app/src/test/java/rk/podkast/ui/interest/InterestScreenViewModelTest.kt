@@ -10,7 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import rk.podkast.data.GenreType
-import rk.podkast.data.database.entity.Genre
+import rk.podkast.data.database.entity.GenreEntity
 import rk.podkast.data.repository.FakeGenreRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,34 +31,37 @@ class InterestScreenViewModelTest {
     }
 
     @Test
-    fun interestViewModel_InitialState_emptyInterestListAndAllOfGenres() {
-        val expected = InterestScreenUiState(fakeRepo.getAllGenres(), listOf())
+    fun interestViewModel_InitialState_emptyInterestListAndAllNotInterestedGenres() {
+        val expected = InterestScreenUiState(
+            interestGenreEntities = emptyList(),
+            notInterestedGenreEntities = fakeRepo.getAllGenres()
+        )
         val result = viewModel.uiState.value
         assertEquals(expected, result)
     }
 
     @Test
-    fun interestViewModel_TogglingOnGivenGenre_TheGenreShouldToggledOn() {
+    fun interestViewModel_interestAGenre_RemoveFromInterestedAndAddToNotInterested() {
+        val genreEntityToInterest = GenreEntity(GenreType.PODCASTSERIES_GOVERNMENT)
+        viewModel.interest(genreEntityToInterest)
         val expected = InterestScreenUiState(
-            fakeRepo.getAllGenres(),
-            listOf(Genre(GenreType.PODCASTSERIES_ARTS))
-        ).interestGenres
-        viewModel.toggleGenre(GenreType.PODCASTSERIES_ARTS)
-        assertEquals(expected, viewModel.uiState.value.interestGenres)
+            interestGenreEntities = listOf(genreEntityToInterest),
+            notInterestedGenreEntities = fakeRepo.getAllGenres().filterNot { it == genreEntityToInterest }
+        )
+        assertEquals(expected, viewModel.uiState.value)
     }
 
     @Test
-    fun interestViewModel_TogglingOffGivenGenre_TheGenreShouldToggledOff() {
-        val interestedGenres = listOf(
-            Genre(GenreType.PODCASTSERIES_ARTS), Genre(GenreType.PODCASTSERIES_GOVERNMENT)
-        )
-        fakeRepo.addGenresToInterestForTest(interestedGenres)
-        // expect to toggled of art `GenreType.PODCASTSERIES_ARTS`
+    fun notInterestAGenre_TheGenreRemoveFromNotInterestedAndAddToInterested() {
+        val genreEntityToNotInterest = GenreEntity(GenreType.PODCASTSERIES_GOVERNMENT)
+        val interestedGenreEntities = listOf(genreEntityToNotInterest, GenreEntity(GenreType.PODCASTSERIES_ARTS))
+        fakeRepo.addGenresToInterestForTest(interestedGenreEntities)
+        viewModel.notInterest(genreEntityToNotInterest)
         val expected = InterestScreenUiState(
-            fakeRepo.getAllGenres(),
-            listOf(Genre(GenreType.PODCASTSERIES_GOVERNMENT))
-        ).interestGenres
-        viewModel.toggleGenre(GenreType.PODCASTSERIES_ARTS)
-        assertEquals(expected, viewModel.uiState.value.interestGenres)
+            interestGenreEntities = listOf(GenreEntity(GenreType.PODCASTSERIES_ARTS)),
+            notInterestedGenreEntities = fakeRepo.getAllGenres()
+        )
+        assert(!expected.interestGenreEntities.contains(genreEntityToNotInterest))
+        assert(expected.notInterestedGenreEntities.contains(genreEntityToNotInterest))
     }
 }
