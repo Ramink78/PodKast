@@ -27,11 +27,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,9 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextMeasurer
@@ -68,7 +66,6 @@ import kotlin.math.roundToInt
 fun InterestScreen(
     modifier: Modifier = Modifier,
 ) {
-    val density = LocalDensity.current
     val gridItemSize = 56.dp
     val gridItemInnerPadding = 4.dp
     val context = LocalContext.current
@@ -89,9 +86,13 @@ fun InterestScreen(
     val listContentBottomPadding =
         fabSize + fabPadding + WindowInsets.navigationBars.asPaddingValues()
             .calculateBottomPadding()
-    Box(modifier = modifier) {
+
+    AnimatableBoxGradient(
+        modifier = modifier
+    ) {
         LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             columns = GridCells.FixedSize(gridItemSize),
@@ -288,36 +289,32 @@ private fun GenreItem(
     onSelect: () -> Unit = {},
     isSelected: Boolean = false,
     textPadding: Dp = 4.dp,
-    textStyle: TextStyle = MaterialTheme.typography.bodyMedium
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
 ) {
-    val strokeColor by animateColorAsState(
-        targetValue =
-        if (isSelected) Color.Unspecified else MaterialTheme.colorScheme.outlineVariant,
-        label = ""
-    )
-    val cardColor by animateColorAsState(
-        targetValue =
-        if (isSelected) MaterialTheme.colorScheme.surfaceContainerHighest else Color.Unspecified,
-        label = ""
-    )
+    val cardColor
+            by animateColorAsState(
+                targetValue =
+                if (isSelected) MaterialTheme.colorScheme.surfaceContainerHighest else Color.Unspecified,
+                label = ""
+            )
     val textColor by animateColorAsState(
         targetValue =
         if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
         label = ""
     )
-    OutlinedCard(
+    ElevatedCard(
         modifier = modifier,
         onClick = onSelect,
         colors = CardDefaults.outlinedCardColors(
             containerColor = cardColor,
         ),
         shape = RoundedCornerShape(10.dp),
-        border = CardDefaults.outlinedCardBorder().copy(brush = SolidColor(strokeColor))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(textPadding), contentAlignment = Alignment.Center
+
         ) {
             Text(
                 textAlign = TextAlign.Center,
