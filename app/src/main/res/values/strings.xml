@@ -24,4 +24,6 @@
     <string name="interest_error">The selected genres must be at least 3</string>
     <string name="you_re_interested">You\'re Interested</string>
     <string name="maybe_you_re_interested">Maybe You\'re Interested</string>
+    <string name="you_aren_t_interest_anything">You aren\'t interest anything</string>
+    <string name="you_are_interest_everything">You\'re interest everything</string>
 </resources>
