@@ -8,8 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import rk.podkast.data.GenreRepository
-import rk.podkast.data.GenreType
-import rk.podkast.data.database.entity.Genre
+import rk.podkast.data.database.entity.GenreEntity
 
 class InterestScreenViewModel(private val genreRepository: GenreRepository) : ViewModel() {
 
@@ -24,28 +23,38 @@ class InterestScreenViewModel(private val genreRepository: GenreRepository) : Vi
     }
 
     private val _uiState =
-        MutableStateFlow(InterestScreenUiState(allGenres = genreRepository.getAllGenres()))
+        MutableStateFlow(InterestScreenUiState())
     val uiState = _uiState.asStateFlow()
 
 
     init {
         viewModelScope.launch {
             genreRepository.interestedGenresFlow().collect { newList ->
-                _uiState.update { it.copy(interestGenres = newList) }
+                _uiState.update { it.copy(interestGenreEntities = newList) }
+            }
+        }
+        viewModelScope.launch {
+            genreRepository.notInterestGenresFlow().collect { newList ->
+                _uiState.update { it.copy(notInterestedGenreEntities = newList) }
             }
         }
     }
 
-
-    fun toggleGenre(genreKey: GenreType) {
+    fun interest(genre: GenreEntity) {
         viewModelScope.launch {
-            genreRepository.toggleGenre(Genre(genreKey))
+            genreRepository.interest(genre)
+        }
+    }
+
+    fun notInterest(genre: GenreEntity) {
+        viewModelScope.launch {
+            genreRepository.notInterest(genre)
         }
     }
 
 }
 
 data class InterestScreenUiState(
-    val allGenres: List<Genre> = emptyList(),
-    val interestGenres: List<Genre> = emptyList(),
+    val interestGenreEntities: List<GenreEntity> = emptyList(),
+    val notInterestedGenreEntities: List<GenreEntity> = emptyList(),
 )
