@@ -7,7 +7,8 @@ import rk.podkast.data.GenreType
 import rk.podkast.data.database.Converter
 
 @Entity(tableName = "interest_genre")
-data class Genre(
+data class GenreEntity(
     @PrimaryKey
-    @TypeConverters(Converter::class) val type: GenreType
+    @TypeConverters(Converter::class)
+    val type: GenreType,
 )

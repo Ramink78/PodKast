@@ -1,34 +1,36 @@
 package rk.podkast.data
 
-import android.content.Context
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import rk.podkast.data.database.GenreDao
-import rk.podkast.data.database.entity.Genre
+import rk.podkast.data.database.entity.GenreEntity
 
 class GenreRepositoryImpl(
     private val genreDao: GenreDao,
-    private val appContext: Context
 ) : GenreRepository {
-    override fun getAllGenres(): List<Genre> {
-        return GenreType.entries.sortedBy {
-            appContext.getString(it.nameRes)
+    override fun getAllGenres(): List<GenreEntity> {
+        return GenreType.entries.map {
+            GenreEntity(type = it)
         }
-            .map { Genre(it) }
     }
 
-    override suspend fun toggleGenre(genre: Genre) {
-        if (isInterested(genre))
-            genreDao.notInterest(genre)
-        else
-            genreDao.interest(genre)
-
+    override suspend fun interest(genreEntity: GenreEntity) {
+        genreDao.interest(genreEntity)
     }
 
-    override fun interestedGenresFlow(): Flow<List<Genre>> {
+    override suspend fun notInterest(genreEntity: GenreEntity) {
+        genreDao.notInterest(genreEntity)
+    }
+
+
+    override fun interestedGenresFlow(): Flow<List<GenreEntity>> {
         return genreDao.interestedGenresFlow()
     }
 
-    private suspend fun isInterested(genre: Genre) =
-        genreDao.isExist(genre.type).isNotEmpty()
+    override fun notInterestGenresFlow(): Flow<List<GenreEntity>> {
+        return genreDao.interestedGenresFlow().transform {
+            emit(getAllGenres().subtract(it.toSet()).toList())
+        }
+    }
 
 }

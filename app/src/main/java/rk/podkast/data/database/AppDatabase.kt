@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import rk.podkast.data.database.entity.Genre
+import rk.podkast.data.database.entity.GenreEntity
 
-@Database(entities = [Genre::class], version = 1)
+@Database(entities = [GenreEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun genreDao(): GenreDao
 
