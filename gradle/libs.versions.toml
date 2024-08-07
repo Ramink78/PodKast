@@ -15,8 +15,8 @@ coroutines = "1.9.0-RC"
 composeFoundation = "1.7.0-beta06"
 lottie = "6.5.0"
 ktor = "2.3.12"
-coil = "2.7.0"
 composeNavigation = "2.8.0-beta06"
+coil = "2.7.0"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
