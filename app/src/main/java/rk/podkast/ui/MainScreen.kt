@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import rk.podkast.R
+import rk.podkast.ui.home.HomeScreen
 
 @Serializable
 data object MainNav
@@ -41,13 +42,14 @@ data object Profile
 @Composable
 fun MainScreen(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
-    Scaffold(modifier = modifier, bottomBar = { AppNavigation() }) {
+    Scaffold(modifier = modifier, bottomBar = { AppNavigation() }) {innerPaddings->
         NavHost(
-            modifier = Modifier.padding(it),
             navController = navController,
             startDestination = Home
         ) {
-            composable<Home> {}
+            composable<Home> {
+                HomeScreen(contentPadding = innerPaddings)
+            }
             composable<Profile> {}
             composable<Favorite> {}
             composable<Category> {}
