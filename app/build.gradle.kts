@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation (libs.androidx.compose.navigation)
     implementation(libs.bundles.ktorBundle)
+    implementation(libs.coil)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)

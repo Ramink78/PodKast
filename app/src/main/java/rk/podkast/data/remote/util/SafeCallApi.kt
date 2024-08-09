@@ -10,7 +10,7 @@ import io.ktor.client.request.request
 import io.ktor.utils.io.errors.IOException
 import kotlinx.serialization.SerializationException
 
-suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.() -> Unit): Response<T, DataError.NetworkError> {
+suspend inline fun <reified T> HttpClient.safeRequest(block: HttpRequestBuilder.() -> Unit): Response<T, DataError> {
     return try {
         val response = request { block() }
         Response.Success(data = response.body())
