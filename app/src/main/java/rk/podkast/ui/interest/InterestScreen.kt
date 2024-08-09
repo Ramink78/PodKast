@@ -64,6 +64,7 @@ import kotlin.math.roundToInt
 @Composable
 fun InterestScreen(
     modifier: Modifier = Modifier,
+    onFinish: () -> Unit,
 ) {
     val gridItemSize = 56.dp
     val gridItemInnerPadding = 4.dp
@@ -146,7 +147,7 @@ fun InterestScreen(
                 .navigationBarsPadding()
                 .padding(fabPadding)
                 .align(Alignment.BottomEnd),
-            onClick = {},
+            onClick = onFinish,
             containerColor = MaterialTheme.colorScheme.primary,
             elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp)
         ) {
@@ -331,6 +332,6 @@ private fun GenreItem(
 @Composable
 private fun InterestScreenPreview() {
     PodKastTheme(darkTheme = true) {
-        InterestScreen(modifier = Modifier.fillMaxSize())
+        InterestScreen(modifier = Modifier.fillMaxSize(), onFinish = {})
     }
 }

@@ -5,12 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import rk.podkast.ui.MainNav
+import rk.podkast.ui.mainGraph
+import rk.podkast.ui.onboarding.OnBoardingNav
+import rk.podkast.ui.onboarding.onboardingGraph
 import rk.podkast.ui.theme.PodKastTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,30 +20,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+            val startDestination = OnBoardingNav
             PodKastTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    NavHost(navController = navController, startDestination = startDestination) {
+                        onboardingGraph(onFinish = {
+                            navController.navigate(MainNav) {
+                                popUpTo<OnBoardingNav>()
+                            }
+                        })
+                        mainGraph()
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PodKastTheme {
-        Greeting("Android")
-    }
-}

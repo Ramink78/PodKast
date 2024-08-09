@@ -31,7 +31,7 @@ import rk.podkast.ui.interest.AnimatableBoxGradient
 import rk.podkast.ui.interest.InterestScreen
 
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier) {
+fun OnboardingScreen(modifier: Modifier = Modifier, onFinish: () -> Unit) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
     AnimatableBoxGradient(modifier = modifier) {
         HorizontalPager(
@@ -39,7 +39,7 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
             Modifier.fillMaxSize(),
             beyondViewportPageCount = 1
         ) { pageNumber ->
-            PageContent(currentPage = pageNumber)
+            PageContent(currentPage = pageNumber,onFinish=onFinish)
         }
     }
 
@@ -48,7 +48,8 @@ fun OnboardingScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun PageContent(
-    currentPage: Int
+    currentPage: Int,
+    onFinish: () -> Unit
 ) {
     when (currentPage) {
         in 0..1 -> {
@@ -85,6 +86,7 @@ private fun PageContent(
         else -> {
             InterestScreen(
                 modifier = Modifier.fillMaxSize(),
+                onFinish=onFinish
             )
         }
 

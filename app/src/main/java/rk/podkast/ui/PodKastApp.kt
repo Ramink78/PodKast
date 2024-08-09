@@ -13,26 +13,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import rk.podkast.R
 
 @Serializable
+data object MainNav
+
+@Serializable
+data object Main
+@Serializable
 object Home
 
 @Serializable
-object Category
+data object Category
 
 @Serializable
-object Saved
+data object Favorite
 
 @Serializable
-object Profile
+data object Profile
 
 @Composable
-fun App(modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     Scaffold(modifier = modifier, bottomBar = { AppNavigation() }) {
         NavHost(
@@ -40,9 +47,10 @@ fun App(modifier: Modifier = Modifier) {
             navController = navController,
             startDestination = Home
         ) {
-            composable<Home> {
-
-            }
+            composable<Home> {}
+            composable<Profile> {}
+            composable<Favorite> {}
+            composable<Category> {}
 
         }
     }
@@ -95,4 +103,12 @@ fun RowScope.AppNavigationItem(
         }
 
     )
+}
+
+fun NavGraphBuilder.mainGraph() {
+    navigation<MainNav>(startDestination = Main) {
+        composable<Main> {
+            MainScreen()
+        }
+    }
 }
