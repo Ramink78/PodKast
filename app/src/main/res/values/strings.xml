@@ -26,4 +26,10 @@
     <string name="maybe_you_re_interested">Maybe You\'re Interested</string>
     <string name="you_aren_t_interest_anything">You aren\'t interest anything</string>
     <string name="you_are_interest_everything">You\'re interest everything</string>
+    <string name="onboarding_screen_title1">Just Listen</string>
+    <string name="onboarding_screen_description1">Welcome to the PodKast application. With over 4
+        million podcasts available, you can learn a lot of things here.
+    </string>
+    <string name="onboarding_screen_title2">For You</string>
+    <string name="onboarding_screen_description2">Just let us know which genres you are interested in, and we\'ll adjust everything for you in a moment.</string>
 </resources>

@@ -44,6 +44,7 @@ android {
     }
     packaging {
         resources {
+            resources.excludes.add("META-INF/*")
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
@@ -63,6 +64,10 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.lottieCompose)
+    implementation (libs.androidx.compose.navigation)
+    implementation(libs.bundles.ktorBundle)
+    implementation(libs.coil)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
